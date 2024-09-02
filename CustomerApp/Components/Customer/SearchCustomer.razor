@@ -1,0 +1,57 @@
+﻿@page "/search"
+@inject CustomerService CustomerService
+
+<PageTitle>Search Customer</PageTitle>
+
+<h1>Search Customer</h1>
+
+<div class="form-group">
+    <label for="postcode">Postcode:</label>
+    <input id="postcode" class="form-control" @bind="searchPostcode" />
+</div>
+
+<button class="btn btn-primary" @onclick="SearchCustomerByPostcodeAsync">Search</button>
+
+@if (customer != null)
+{
+    <h2>Customer Details</h2>
+    <table class="table">
+        <tr><th>Customer ID</th><td>@customer.CustomerID</td></tr>
+        <tr><th>First Name</th><td>@customer.FirstName</td></tr>
+        <tr><th>Last Name</th><td>@customer.LastName</td></tr>
+        <tr><th>Email</th><td>@customer.Email</td></tr>
+        <tr><th>Phone</th><td>@customer.Phone</td></tr>
+        <tr><th>Postcode</th><td>@customer.Postcode</td></tr>
+    </table>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@code {
+    private string searchPostcode;
+    private Customer.CustomerItem customer;
+    private string errorMessage;
+
+    private async Task SearchCustomerByPostcodeAsync()
+    {
+        try
+        {
+            customer = await CustomerService.GetCustomerByPostcodeAsync(searchPostcode);
+            if (customer == null)
+            {
+                errorMessage = "No customer found with the given postcode.";
+            }
+            else
+            {
+                errorMessage = string.Empty;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred while searching for the customer: {ex.Message}";
+        }
+    }
+}

@@ -1,0 +1,64 @@
+﻿@page "/create"
+@inject CustomerService CustomerService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Customer</PageTitle>
+
+<h1>Create Customer</h1>
+
+<EditForm Model="@newCustomer" OnValidSubmit="CreateCustomerAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="firstName">First Name:</label>
+        <InputText id="firstName" class="form-control" @bind-Value="newCustomer.FirstName" />
+    </div>
+
+    <div class="form-group">
+        <label for="lastName">Last Name:</label>
+        <InputText id="lastName" class="form-control" @bind-Value="newCustomer.LastName" />
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <InputText id="email" class="form-control" @bind-Value="newCustomer.Email" />
+    </div>
+
+    <div class="form-group">
+        <label for="phone">Phone:</label>
+        <InputText id="phone" class="form-control" @bind-Value="newCustomer.Phone" />
+    </div>
+
+    <div class="form-group">
+        <label for="createPostcode">Postcode:</label>
+        <InputText id="createPostcode" class="form-control" @bind-Value="newCustomer.Postcode" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Create Customer</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-info mt-3">@message</div>
+}
+
+@code {
+    private Customer.CustomerItem newCustomer = new Customer.CustomerItem();
+    private string message;
+
+    private async Task CreateCustomerAsync()
+    {
+        try
+        {
+            int newCustomerId = await CustomerService.CreateCustomerAsync(newCustomer);
+            message = $"Customer created successfully with ID: {newCustomerId}";
+            newCustomer = new Customer.CustomerItem(); // Reset the form
+            NavigationManager.NavigateTo($"/?postcode={newCustomer.Postcode}");
+        }
+        catch (Exception ex)
+        {
+            message = $"An error occurred while creating the customer: {ex.Message}";
+        }
+    }
+}
